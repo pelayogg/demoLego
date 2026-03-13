@@ -9,14 +9,20 @@
       --bg: #050814;
       --bg-soft: #0d1430;
       --text: #f5f7ff;
-      --muted: rgba(233, 238, 255, 0.68);
+      --muted: rgba(233, 238, 255, 0.72);
       --line: rgba(255,255,255,0.14);
       --panel: rgba(255,255,255,0.06);
+      --panel-strong: rgba(7, 12, 28, 0.72);
       --shadow: 0 30px 80px rgba(0,0,0,0.45);
       --radius: 28px;
+      --content-width: min(1200px, calc(100vw - 48px));
+      --safe-top: max(24px, env(safe-area-inset-top));
+      --safe-bottom: max(24px, env(safe-area-inset-bottom));
     }
+
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
+
     body {
       margin: 0;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -26,16 +32,29 @@
         radial-gradient(circle at 50% 45%, rgba(255,255,255,0.05), transparent 34%),
         linear-gradient(180deg, #0a1230 0%, #060a16 56%, #02040b 100%);
       min-height: 100vh;
+      overflow-x: clip;
     }
+
+    img, canvas, video { max-width: 100%; }
     a { color: inherit; }
-    .hero, .content, .source-video { width: min(1200px, calc(100vw - 48px)); margin: 0 auto; }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.92em;
+    }
+
+    .hero, .content, .source-video {
+      width: var(--content-width);
+      margin-inline: auto;
+    }
+
     .hero {
-      min-height: 100vh;
+      min-height: 100svh;
       display: grid;
       place-items: center;
       text-align: center;
-      padding: 72px 0 24px;
+      padding: clamp(88px, 12vh, 128px) 0 40px;
     }
+
     .eyebrow {
       display: inline-flex;
       align-items: center;
@@ -49,19 +68,24 @@
       letter-spacing: 0.02em;
       font-size: 14px;
     }
+
     .hero h1 {
       font-size: clamp(48px, 8vw, 112px);
       line-height: 0.95;
       letter-spacing: -0.04em;
       margin: 22px 0 18px;
+      text-wrap: balance;
     }
+
     .hero p {
       max-width: 860px;
       margin: 0 auto;
       font-size: clamp(18px, 2.2vw, 28px);
       line-height: 1.35;
       color: var(--muted);
+      text-wrap: pretty;
     }
+
     .hero .hint {
       margin-top: 36px;
       color: rgba(255,255,255,0.55);
@@ -69,18 +93,23 @@
       letter-spacing: 0.04em;
       text-transform: uppercase;
     }
+
     .sequence-wrap {
       position: relative;
       height: 520vh;
+      isolation: isolate;
     }
+
     .sequence-sticky {
       position: sticky;
       top: 0;
-      height: 100vh;
+      min-height: 100svh;
+      height: 100svh;
       display: grid;
       place-items: center;
       overflow: clip;
     }
+
     .sequence-glow {
       position: absolute;
       inset: 0;
@@ -89,62 +118,93 @@
         radial-gradient(circle at 50% 50%, rgba(255,255,255,0.08), transparent 30%);
       pointer-events: none;
     }
+
     .canvas-shell {
       position: relative;
-      width: min(1320px, 100vw);
-      height: 100vh;
+      width: min(1440px, 100vw);
+      min-height: 100svh;
+      padding:
+        calc(var(--safe-top) + 24px)
+        clamp(20px, 4vw, 48px)
+        calc(var(--safe-bottom) + 28px);
       display: grid;
-      place-items: center;
+      grid-template-columns: minmax(260px, 380px) minmax(0, 1fr) minmax(240px, 300px);
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      grid-template-areas:
+        ". headline ."
+        "copy canvas loader"
+        ". . .";
+      align-items: center;
+      gap: clamp(16px, 2.5vw, 28px);
     }
+
     canvas {
+      grid-area: canvas;
+      justify-self: center;
+      align-self: center;
       display: block;
       width: auto;
       height: auto;
-      max-width: 100vw;
-      max-height: 100vh;
+      max-width: min(100%, 1000px);
+      max-height: min(68svh, 820px);
       filter: drop-shadow(0 30px 90px rgba(0, 0, 0, 0.45));
+      z-index: 1;
     }
-    .headline {
-      position: absolute;
-      top: 56px;
-      left: 50%;
-      transform: translateX(-50%);
-      text-align: center;
-      width: min(760px, calc(100vw - 40px));
+
+    .headline,
+    .copy-card,
+    .loader {
+      position: relative;
       z-index: 2;
+    }
+
+    .headline {
+      grid-area: headline;
+      text-align: center;
+      justify-self: center;
+      width: min(760px, 100%);
       pointer-events: none;
     }
+
     .headline .label {
       font-size: 14px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: rgba(255,255,255,0.65);
     }
+
     .headline h2 {
       margin: 10px 0 0;
       font-size: clamp(34px, 5vw, 76px);
       line-height: 1;
       letter-spacing: -0.04em;
+      text-wrap: balance;
     }
+
     .headline p {
       margin: 16px auto 0;
       color: var(--muted);
       font-size: clamp(16px, 1.5vw, 20px);
       max-width: 680px;
+      text-wrap: pretty;
     }
-    .copy-card {
-      position: absolute;
-      left: clamp(20px, 6vw, 72px);
-      bottom: 44px;
-      width: min(380px, calc(100vw - 40px));
-      z-index: 3;
-      background: linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04));
+
+    .copy-card,
+    .loader {
+      width: 100%;
       border: 1px solid rgba(255,255,255,0.12);
-      border-radius: var(--radius);
-      padding: 22px 22px 20px;
       backdrop-filter: blur(18px);
       box-shadow: var(--shadow);
     }
+
+    .copy-card {
+      grid-area: copy;
+      align-self: end;
+      background: linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04));
+      border-radius: var(--radius);
+      padding: 22px 22px 20px;
+    }
+
     .copy-card .step {
       font-size: 12px;
       letter-spacing: 0.14em;
@@ -152,33 +212,38 @@
       color: rgba(255,255,255,0.58);
       margin-bottom: 12px;
     }
+
     .copy-card h3 {
       margin: 0;
       font-size: clamp(24px, 3vw, 34px);
       line-height: 1.05;
       letter-spacing: -0.04em;
+      text-wrap: balance;
     }
+
     .copy-card p {
       margin: 12px 0 0;
       color: var(--muted);
       line-height: 1.45;
       font-size: 15px;
+      text-wrap: pretty;
     }
+
     .loader {
-      position: absolute;
-      right: clamp(20px, 5vw, 64px);
-      bottom: 44px;
-      z-index: 3;
-      width: min(290px, calc(100vw - 40px));
+      grid-area: loader;
+      align-self: end;
       padding: 18px 18px 16px;
       border-radius: 22px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(6, 10, 22, 0.65);
-      backdrop-filter: blur(18px);
-      box-shadow: var(--shadow);
-      transition: opacity .35s ease;
+      background: var(--panel-strong);
+      transition: opacity .35s ease, transform .35s ease;
     }
-    .loader.hidden { opacity: 0; pointer-events: none; }
+
+    .loader.hidden {
+      opacity: 0;
+      transform: translateY(6px);
+      pointer-events: none;
+    }
+
     .loader .meta {
       display: flex;
       justify-content: space-between;
@@ -187,49 +252,62 @@
       color: rgba(255,255,255,0.88);
       font-size: 14px;
     }
+
     .loader .bar {
       height: 7px;
       border-radius: 999px;
       background: rgba(255,255,255,0.12);
       overflow: hidden;
     }
+
     .loader .fill {
       width: 0%;
       height: 100%;
       border-radius: 999px;
       background: linear-gradient(90deg, #7ca0ff, #ffffff);
     }
+
     .content {
       padding: 120px 0 80px;
       display: grid;
       gap: 18px;
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
-    .card {
+
+    .card,
+    .specs {
       background: var(--panel);
       border: 1px solid var(--line);
+      backdrop-filter: blur(16px);
+    }
+
+    .card {
       border-radius: var(--radius);
       padding: 26px;
-      backdrop-filter: blur(16px);
       min-height: 220px;
     }
+
     .card h4 {
       margin: 0 0 10px;
       font-size: 28px;
       letter-spacing: -0.03em;
     }
+
     .card p {
       margin: 0;
       color: var(--muted);
       line-height: 1.55;
+      text-wrap: pretty;
     }
+
     .source-video {
       padding: 30px 0 120px;
       display: grid;
       gap: 18px;
-      grid-template-columns: 1.2fr .8fr;
-      align-items: center;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+      align-items: start;
     }
+
     .video-shell {
       border-radius: 32px;
       overflow: hidden;
@@ -237,46 +315,134 @@
       box-shadow: var(--shadow);
       background: rgba(255,255,255,0.04);
     }
+
     video {
       display: block;
       width: 100%;
       height: auto;
       background: #000;
+      aspect-ratio: 16 / 9;
     }
+
     .specs {
-      background: var(--panel);
-      border: 1px solid var(--line);
       border-radius: 32px;
       padding: 28px;
-      backdrop-filter: blur(16px);
+      position: sticky;
+      top: 24px;
     }
+
     .specs h3 {
       margin: 0 0 14px;
       font-size: 34px;
       letter-spacing: -0.04em;
+      text-wrap: balance;
     }
-    .specs p, .specs li {
+
+    .specs p,
+    .specs li {
       color: var(--muted);
       line-height: 1.5;
+      text-wrap: pretty;
     }
-    .specs ul { padding-left: 20px; margin: 14px 0 0; }
+
+    .specs ul {
+      padding-left: 20px;
+      margin: 14px 0 0;
+    }
+
     footer {
       text-align: center;
       padding: 0 24px 44px;
       color: rgba(255,255,255,0.48);
       font-size: 13px;
     }
-    @media (max-width: 900px) {
-      .content, .source-video { grid-template-columns: 1fr; }
-      .copy-card, .loader {
-        left: 20px;
-        right: 20px;
-        width: auto;
+
+    @media (max-width: 1180px) {
+      .canvas-shell {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-rows: auto minmax(0, 1fr) auto auto;
+        grid-template-areas:
+          "headline headline"
+          "canvas canvas"
+          "copy loader"
+          ". .";
       }
-      .loader { bottom: 176px; }
-      .copy-card { bottom: 32px; }
-      .headline { top: 32px; }
-      .sequence-wrap { height: 460vh; }
+
+      canvas {
+        max-height: min(60svh, 720px);
+      }
+    }
+
+    @media (max-width: 900px) {
+      .content,
+      .source-video {
+        grid-template-columns: 1fr;
+      }
+
+      .specs {
+        position: static;
+      }
+
+      .sequence-wrap {
+        height: 460vh;
+      }
+
+      .canvas-shell {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto minmax(0, 1fr) auto auto;
+        grid-template-areas:
+          "headline"
+          "canvas"
+          "loader"
+          "copy";
+        align-content: start;
+      }
+
+      .headline {
+        width: min(760px, calc(100vw - 40px));
+      }
+
+      canvas {
+        max-width: 100%;
+        max-height: min(50svh, 520px);
+      }
+
+      .copy-card,
+      .loader {
+        max-width: none;
+      }
+    }
+
+    @media (max-width: 640px) {
+      :root {
+        --content-width: min(1200px, calc(100vw - 24px));
+        --radius: 24px;
+      }
+
+      .hero {
+        padding-top: 80px;
+      }
+
+      .headline h2 {
+        font-size: clamp(30px, 10vw, 54px);
+      }
+
+      .canvas-shell {
+        padding-top: calc(var(--safe-top) + 16px);
+        padding-bottom: calc(var(--safe-bottom) + 20px);
+      }
+
+      .card,
+      .specs,
+      .copy-card,
+      .loader {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .sequence-wrap {
+        height: 420vh;
+      }
     }
   </style>
 </head>
@@ -302,13 +468,16 @@
           <h2>Como una pieza más.</h2>
           <p>Las piezas entran desde el exterior, encajan y forman la palabra final mientras el canvas permanece fijo en pantalla.</p>
         </div>
+
         <canvas id="sequenceCanvas" aria-label="Animación por scroll de piezas tipo LEGO formando la palabra Promotions"></canvas>
+
         <div class="copy-card" id="copyCard">
           <div class="step" id="copyStep">Paso 01</div>
           <h3 id="copyTitle">Todo empieza en el vacío.</h3>
           <p id="copyBody">El escenario permanece quieto mientras el usuario avanza y la secuencia responde exactamente a la posición del scroll.</p>
         </div>
-        <div class="loader" id="loader">
+
+        <div class="loader" id="loader" aria-live="polite">
           <div class="meta"><span>Precargando frames</span><span id="loaderText">0%</span></div>
           <div class="bar"><div class="fill" id="loaderFill"></div></div>
         </div>
@@ -357,6 +526,7 @@
       const VIDEO_HEIGHT = 720;
       const FRAME_COUNT = 180;
       const section = document.getElementById('sequenceSection');
+      const sticky = section.querySelector('.sequence-sticky');
       const canvas = document.getElementById('sequenceCanvas');
       const ctx = canvas.getContext('2d', { alpha: true });
       const aspectRatio = VIDEO_WIDTH / VIDEO_HEIGHT;
@@ -379,6 +549,8 @@
       let currentFrame = -1;
       let targetFrame = 0;
       let rafPending = false;
+      let cachedDrawWidth = 0;
+      let cachedDrawHeight = 0;
 
       function frameUrl(index) {
         return `frames/frame_${String(index + 1).padStart(4, '0')}.webp`;
@@ -398,42 +570,61 @@
             img.decoding = 'async';
             img.loading = 'eager';
             img.src = frameUrl(i);
-            img.onload = () => { images[i] = img; loaded += 1; updateLoader(); resolve(); };
+            img.onload = () => {
+              images[i] = img;
+              loaded += 1;
+              updateLoader();
+              resolve();
+            };
             img.onerror = () => reject(new Error(`No se pudo cargar ${img.src}`));
           }))
         );
       }
 
       function getDisplaySize() {
-        const vw = window.innerWidth;
-        const vh = window.innerHeight;
-        let width = vw;
+        const shell = sticky.querySelector('.canvas-shell');
+        const maxWidth = Math.min(shell.clientWidth, 1000);
+        const maxHeight = Math.min(window.innerHeight * 0.68, 820);
+
+        let width = maxWidth;
         let height = width / aspectRatio;
-        if (height > vh) {
-          height = vh;
+
+        if (height > maxHeight) {
+          height = maxHeight;
           width = height * aspectRatio;
         }
-        return { width, height };
+
+        return {
+          width: Math.round(width),
+          height: Math.round(height)
+        };
       }
 
       function resizeCanvas() {
         const { width, height } = getDisplaySize();
-        const dpr = window.devicePixelRatio || 1;
+        const dpr = Math.max(1, window.devicePixelRatio || 1);
+
+        cachedDrawWidth = width;
+        cachedDrawHeight = height;
+
         canvas.style.width = `${width}px`;
         canvas.style.height = `${height}px`;
         canvas.width = Math.round(width * dpr);
         canvas.height = Math.round(height * dpr);
+
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.scale(dpr, dpr);
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+
         if (currentFrame >= 0 && images[currentFrame]) drawFrame(currentFrame);
       }
 
       function drawFrame(index) {
         const img = images[index];
         if (!img) return;
-        const { width, height } = getDisplaySize();
-        ctx.clearRect(0, 0, width, height);
-        ctx.drawImage(img, 0, 0, width, height);
+        ctx.clearRect(0, 0, cachedDrawWidth, cachedDrawHeight);
+        ctx.drawImage(img, 0, 0, cachedDrawWidth, cachedDrawHeight);
       }
 
       function progressInSection() {
@@ -476,6 +667,7 @@
         currentFrame = 0;
         drawFrame(0);
         requestDraw();
+
         window.addEventListener('scroll', requestDraw, { passive: true });
         window.addEventListener('resize', () => {
           resizeCanvas();
